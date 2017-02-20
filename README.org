@@ -1,0 +1,31 @@
+* About
+
+This is a simple package for parsing [[http://wiki.ros.org/urdf][Unified Robot Description Format (URDF)]]
+files describing the kinematics and dynamics of a robotic manipulator, and
+automatically extracting screw axes in either a spatial frame or a body frame.
+
+The format of the screw axes descriptions is suitable for use with the
+[[https://github.com/NxRLab/ModernRobotics][ModernRobotics]] library developed to accompany the book "Modern Robotics:
+Mechanics, Planning, and Control," by Kevin M. Lynch and Frank C. Park,
+Cambridge University Press, 2017. More about the book at [[http://lynchandpark.org][lynchandpark.org]].
+
+** Limitations and Assumptions
+
+* Example
+
+* Dependencies:
+** Building Dependencies
+   + [[http://www.numpy.org/][Numpy]] :: Required for numerical computations and array handling
+   + [[https://github.com/ros/urdf_parser_py][urdf_parser_py]] :: Required for parsing URDFs. May be installable through
+        system package manager
+
+** Testing Dependencies
+   + [[https://github.com/NxRLab/ModernRobotics][ModernRobotics]] :: Required for verifying forward kinematics calculations
+        with the screws extracted from URDFs
+
+* Installation
+
+* Related Projects
+
+
+
