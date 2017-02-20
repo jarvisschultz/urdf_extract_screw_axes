@@ -1,5 +1,6 @@
 import numpy as np
 from urdf_parser_py.urdf import URDF
+from pykdl_utils.kdl_kinematics import KDLKinematics
 
 class ScrewParser(object):
     """
@@ -48,18 +49,22 @@ class ScrewParser(object):
             self._build_chain()
         else:
             raise ValueError("end frame '%s' is not in URDF; be sure to pass a link name"%value)
+        return
         
     def _build_chain(self):
-        chain = self._robot.get_chain(self._base, self._end, joints=True, links=False, fixed=True)
-        free_chain = []
-        n = 0
-        for j in chain:
-            if j.type != 'fixed':
-                free_chain.append(j)
-                n += 1
-        self._chain = chain
-        self._free_chain = free_chain
-        self._n = n
+        self._chain = KDLKinematics(self._robot, self._base, self._end)
+        self._free_chain = self._chain.get_joint_names()
+        self._n = self._chain.num_joints
+        # chain = self._robot.get_chain(self._base, self._end, joints=True, links=False, fixed=True)
+        # free_chain = []
+        # n = 0
+        # for j in chain:
+        #     if j.type != 'fixed':
+        #         free_chain.append(j)
+        #         n += 1
+        # self._chain = chain
+        # self._free_chain = free_chain
+        # self._n = n
         return
 
     def get_spatial_description(self):
@@ -69,11 +74,19 @@ class ScrewParser(object):
         configuration.
         """
         Slist = np.zeros((6, self._n))
-        M0 = np.zeros((4,4))
-        M0[-1,1] = 1
-        for j in self._chain:
-    
-
-
-    
-    
+        # M0 = np.zeros((4,4))
+        # M0[-1,1] = 1
+        M0 = self._chain.forward(np.zeros(self._n))
+        for i,j in enumerate(self._free_chain):
+            g_base_child = np.array(self._chain.forward(np.zeros(self._n), self._robot.joint_map[j].child))
+            if j.type in ['revolute', 'continuous']:
+                axis_child = np.array(np.axis)
+                axis_base = np.dot(g_base_child[0:3,0:3], axis_child)
+                q_vec = g_base_child[0:3,-1]
+                v_vec = -np.cross(axis_base, q_vec)
+                Slist[i] = np.hstack((axis_base, v_vec))
+            # elif j.type is 'prismatic':
+            else:
+                print "[ERROR] on joint {0:d} (name = {1:s} type = {2:s})".format(i, j.name, j.type)
+                raise ValueError("Currently only support revolute and prismatic joints")
+        return M0, Slist

@@ -13,7 +13,7 @@ Cambridge University Press, 2017. More about the book at [[http://lynchandpark.o
 
 * Example
 
-* Dependencies:
+* Dependencies
 ** Building Dependencies
    + [[http://www.numpy.org/][Numpy]] :: Required for numerical computations and array handling
    + [[https://github.com/ros/urdf_parser_py][urdf_parser_py]] :: Required for parsing URDFs. May be installable through
