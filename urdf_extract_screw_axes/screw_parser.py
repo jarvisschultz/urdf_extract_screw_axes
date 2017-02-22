@@ -1,6 +1,7 @@
 import numpy as np
 from urdf_parser_py.urdf import URDF
 from pykdl_utils.kdl_kinematics import KDLKinematics
+import geometry
 
 class ScrewParser(object):
     """
@@ -41,7 +42,7 @@ class ScrewParser(object):
     def end(self):
         return self._end
 
-    @property.setter
+    @end.setter
     def end(self, value):
         # check that the value is in the URDF and that the base is a parent:
         if value in self._robot.link_map.keys():
@@ -76,17 +77,26 @@ class ScrewParser(object):
         Slist = np.zeros((6, self._n))
         # M0 = np.zeros((4,4))
         # M0[-1,1] = 1
-        M0 = self._chain.forward(np.zeros(self._n))
+        M0 = np.array(self._chain.forward(np.zeros(self._n)))
         for i,j in enumerate(self._free_chain):
-            g_base_child = np.array(self._chain.forward(np.zeros(self._n), self._robot.joint_map[j].child))
-            if j.type in ['revolute', 'continuous']:
-                axis_child = np.array(np.axis)
+            joint = self._robot.joint_map[j]
+            g_base_child = np.array(self._chain.forward(np.zeros(self._n), joint.child))
+            if joint.type in ['revolute', 'continuous']:
+                axis_child = np.array(joint.axis)
                 axis_base = np.dot(g_base_child[0:3,0:3], axis_child)
                 q_vec = g_base_child[0:3,-1]
                 v_vec = -np.cross(axis_base, q_vec)
-                Slist[i] = np.hstack((axis_base, v_vec))
+                Slist[:,i] = np.hstack((axis_base, v_vec))
             # elif j.type is 'prismatic':
             else:
                 print "[ERROR] on joint {0:d} (name = {1:s} type = {2:s})".format(i, j.name, j.type)
                 raise ValueError("Currently only support revolute and prismatic joints")
         return M0, Slist
+
+    def get_body_description(self):
+        M0, Slist = self.get_spatial_description()
+        Blist = np.zeros(Slist.shape)
+        M0_inv = geometry.se3_inverse(M0)
+        for i,s in enumerate(Slist.T):
+            Blist[:,i] = np.dot(geometry.adjoint(M0_inv), s)
+        return M0, Blist

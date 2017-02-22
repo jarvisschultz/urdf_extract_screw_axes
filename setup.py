@@ -6,9 +6,9 @@ install_requires = [
     ]
 
 test_requires = [
-    'modern_robotics'
+    'modern_robotics',
+    'nose'
     ]
-
 
 setup(
     name='urdf_extract_screw_axes',
