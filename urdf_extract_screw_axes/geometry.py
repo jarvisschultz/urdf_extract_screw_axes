@@ -48,12 +48,12 @@ def so3andp2se3(R,p):
     return g
 
 def se32so3andp(g):
-    return g[0:3,0:3], g[0:3,-1]
+    return np.array(g[0:3,0:3]), np.array(g[0:3,-1]).flatten()
 
 def hat(w):
     return np.array([[0, -w[2], w[1]],
                      [w[2], 0, -w[0]],
-                     [-w[2], w[0], 0]])
+                     [-w[1], w[0], 0]])
 def hat6(v):
     return np.r_[np.c_[hat([v[0], v[1], v[2]]), [v[3], v[4], v[5]]],
                  np.zeros((1,4))]

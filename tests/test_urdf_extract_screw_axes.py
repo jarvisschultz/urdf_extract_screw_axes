@@ -1,6 +1,7 @@
 import modern_robotics as mr
 from urdf_parser_py.urdf import URDF
 import urdf_extract_screw_axes.screw_parser as uesa
+from urdf_extract_screw_axes.utils import suppress_stdout_stderr
 import numpy as np
 import os
 import sys
@@ -27,7 +28,8 @@ def arrprint(g):
 def run_spatial_screw(fname, base, end, Slist_manual, M_manual, decimal=5):
     print "============================================================"
     fullname = os.path.join(os.path.dirname(__file__),fname)
-    robot = URDF.from_xml_file(fullname)
+    with suppress_stdout_stderr():
+        robot = URDF.from_xml_file(fullname)
     s = uesa.ScrewParser(robot, "base", "right_hand")
     M0, Slist = s.get_spatial_description()
     print "File = ",fname
@@ -55,7 +57,8 @@ def run_spatial_screw(fname, base, end, Slist_manual, M_manual, decimal=5):
 def run_body_screw(fname, base, end, Blist_manual, M_manual, decimal=5):
     print "============================================================"
     fullname = os.path.join(os.path.dirname(__file__),fname)
-    robot = URDF.from_xml_file(fullname)
+    with suppress_stdout_stderr():
+        robot = URDF.from_xml_file(fullname)
     s = uesa.ScrewParser(robot, "base", "right_hand")
     M0, Blist = s.get_body_description()
     print "File = ",fname
