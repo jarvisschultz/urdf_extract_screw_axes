@@ -12,12 +12,14 @@ sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), "manua
 TOLERANCE = 1e-5
 NUM = 20
 
+
 @contextlib.contextmanager
 def printoptions(*args, **kwargs):
     orig = np.get_printoptions()
     np.set_printoptions(*args, **kwargs)
     yield
     np.set_printoptions(**orig)
+
 
 def arrprint(g):
     with printoptions(formatter={'float': '{: 0.3f}'.format}, suppress=True):
@@ -27,16 +29,16 @@ def arrprint(g):
 
 def run_spatial_screw(fname, base, end, Slist_manual, M_manual, decimal=5):
     print "============================================================"
-    fullname = os.path.join(os.path.dirname(__file__),fname)
+    fullname = os.path.join(os.path.dirname(__file__), fname)
     with suppress_stdout_stderr():
         robot = URDF.from_xml_file(fullname)
     s = uesa.ScrewParser(robot, base, end)
     M0, Slist = s.get_spatial_description()
-    print "File = ",fname
-    print "Base = ",base
-    print "End = ",end
-    for i, (s_this,s_manual) in enumerate(zip(Slist.T, Slist_manual.T)):
-        print "Joint",i,"spatial screw axes"
+    print "File = ", fname
+    print "Base = ", base
+    print "End = ", end
+    for i, (s_this, s_manual) in enumerate(zip(Slist.T, Slist_manual.T)):
+        print "Joint", i, "spatial screw axes"
         print "    Manual   ",
         arrprint(s_manual)
         print "    Automatic",
@@ -56,15 +58,15 @@ def run_spatial_screw(fname, base, end, Slist_manual, M_manual, decimal=5):
 
 def run_body_screw(fname, base, end, Blist_manual, M_manual, decimal=5):
     print "============================================================"
-    fullname = os.path.join(os.path.dirname(__file__),fname)
+    fullname = os.path.join(os.path.dirname(__file__), fname)
     with suppress_stdout_stderr():
         robot = URDF.from_xml_file(fullname)
     s = uesa.ScrewParser(robot, base, end)
     M0, Blist = s.get_body_description()
-    print "File = ",fname
-    print "Base = ",base
-    print "End = ",end
-    for i, (s_this,s_manual) in enumerate(zip(Blist.T, Blist_manual.T)):
+    print "File = ", fname
+    print "Base = ", base
+    print "End = ", end
+    for i, (s_this, s_manual) in enumerate(zip(Blist.T, Blist_manual.T)):
         print "Joint", i, "body screw axes"
         print "    Manual   ",
         arrprint(s_manual)
@@ -104,5 +106,3 @@ def sawyer_screw_test():
     fname = "urdf/sawyer.urdf"
     run_body_screw(fname, "base", "right_hand", smr.Blist, smr.M0)
     return
-
-
