@@ -22,9 +22,6 @@ class KDLForward(object):
             print "[ERROR] could not compute forward kinematics"
         return g
 
-    def jacobian(self, qarr):
-        return self._do_kdl_jacobian(qarr)
-
     def _joint_list_to_kdl(self, q):
         if q is None:
             return None
@@ -41,12 +38,6 @@ class KDLForward(object):
             for j in range(m.columns()):
                 mat[i, j] = m[i, j]
         return mat
-
-    def _do_kdl_jacobian(self, q):
-        j_kdl = PyKDL.Jacobian(self._chain.getNrOfJoints())
-        q_kdl = self._joint_list_to_kdl(list(q))
-        self._jac_solver.JntToJac(q_kdl, j_kdl)
-        return self._kdl_to_numpy(j_kdl)
 
     def _do_kdl_fk(self, q, ee_link=None):
         endeffec_frame = PyKDL.Frame()

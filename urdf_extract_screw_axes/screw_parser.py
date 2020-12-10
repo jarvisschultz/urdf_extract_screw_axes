@@ -83,8 +83,6 @@ class ScrewParser(object):
             g_base_child = np.array(self._kdl_model.forward(np.zeros(self._n), joint.child))
             if joint.type in ['revolute', 'continuous']:
                 axis_child = np.array(joint.axis)
-                print axis_child
-                print g_base_child
                 axis_base = np.dot(g_base_child[0:3,0:3], axis_child)
                 q_vec = g_base_child[0:3,-1]
                 v_vec = -np.cross(axis_base, q_vec)

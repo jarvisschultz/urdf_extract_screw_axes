@@ -30,23 +30,23 @@ def run_spatial_screw(fname, base, end, Slist_manual, M_manual, decimal=5):
     fullname = os.path.join(os.path.dirname(__file__),fname)
     with suppress_stdout_stderr():
         robot = URDF.from_xml_file(fullname)
-    s = uesa.ScrewParser(robot, "base", "right_hand")
+    s = uesa.ScrewParser(robot, base, end)
     M0, Slist = s.get_spatial_description()
     print "File = ",fname
     print "Base = ",base
     print "End = ",end
     for i, (s_this,s_manual) in enumerate(zip(Slist.T, Slist_manual.T)):
-        print "Joint",i
-        print "Manual   ",
+        print "Joint",i,"spatial screw axes"
+        print "    Manual   ",
         arrprint(s_manual)
-        print "Automatic",
+        print "    Automatic",
         arrprint(s_this)
         print
         np.testing.assert_array_almost_equal(s_this, s_manual, decimal=decimal)
     print "SE(3) Test:"
-    print "Manual   ",
+    print "    Manual   "
     arrprint(M_manual)
-    print "Automatic",
+    print "    Automatic"
     arrprint(M0)
     print
     np.testing.assert_array_almost_equal(M0, M_manual, decimal=decimal)
@@ -59,23 +59,23 @@ def run_body_screw(fname, base, end, Blist_manual, M_manual, decimal=5):
     fullname = os.path.join(os.path.dirname(__file__),fname)
     with suppress_stdout_stderr():
         robot = URDF.from_xml_file(fullname)
-    s = uesa.ScrewParser(robot, "base", "right_hand")
+    s = uesa.ScrewParser(robot, base, end)
     M0, Blist = s.get_body_description()
     print "File = ",fname
     print "Base = ",base
     print "End = ",end
     for i, (s_this,s_manual) in enumerate(zip(Blist.T, Blist_manual.T)):
-        print "Joint",i
-        print "Manual   ",
+        print "Joint", i, "body screw axes"
+        print "    Manual   ",
         arrprint(s_manual)
-        print "Automatic",
+        print "    Automatic",
         arrprint(s_this)
         print
         np.testing.assert_array_almost_equal(s_this, s_manual, decimal=decimal)
     print "SE(3) Test:"
-    print "Manual   ",
+    print "    Manual   "
     arrprint(M_manual)
-    print "Automatic",
+    print "    Automatic"
     arrprint(M0)
     print
     np.testing.assert_array_almost_equal(M0, M_manual, decimal=decimal)
@@ -83,10 +83,26 @@ def run_body_screw(fname, base, end, Blist_manual, M_manual, decimal=5):
     return
 
 
-def baxter_screw_test():
+def baxter_right_hand_screw_test():
     import baxter_MR_description as bmr
     fname = "urdf/baxter.urdf"
     run_spatial_screw(fname, "base", "right_hand", bmr.Slist_right, bmr.M0_brh)
     run_body_screw(fname, "base", "right_hand", bmr.Blist_right, bmr.M0_brh)
     return
+
+
+def baxter_left_hand_screw_test():
+    import baxter_MR_description as bmr
+    fname = "urdf/baxter.urdf"
+    run_spatial_screw(fname, "base", "left_hand", bmr.Slist_left, bmr.M0_blh)
+    run_body_screw(fname, "base", "left_hand", bmr.Blist_left, bmr.M0_blh)
+    return
+
+
+def sawyer_screw_test():
+    import sawyer_MR_description as smr
+    fname = "urdf/sawyer.urdf"
+    run_body_screw(fname, "base", "right_hand", smr.Blist, smr.M0)
+    return
+
 
