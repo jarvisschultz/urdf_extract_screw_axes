@@ -1,6 +1,6 @@
 import numpy as np
 from urdf_parser_py.urdf import URDF
-from pykdl_utils.kdl_kinematics import KDLKinematics
+from kdl_forward import KDLForward
 import geometry
 
 class ScrewParser(object):
@@ -19,8 +19,8 @@ class ScrewParser(object):
         self._base = base_link
         self._end = end_link
         self._n = -1
-        self._chain = None
-        self._free_chain = None
+        self._kdl_model = None
+        self._joint_names = None
         self._build_chain()
         return
 
@@ -51,20 +51,20 @@ class ScrewParser(object):
         else:
             raise ValueError("end frame '%s' is not in URDF; be sure to pass a link name"%value)
         return
-        
+
     def _build_chain(self):
-        self._chain = KDLKinematics(self._robot, self._base, self._end)
-        self._free_chain = self._chain.get_joint_names()
-        self._n = self._chain.num_joints
+        self._kdl_model = KDLForward(self._robot, self._base, self._end)
+        self._joint_names = self._robot.get_chain(self._base, self._end, links=False, fixed=False)
+        self._n = len(self._joint_names)
         # chain = self._robot.get_chain(self._base, self._end, joints=True, links=False, fixed=True)
-        # free_chain = []
+        # joint_names = []
         # n = 0
         # for j in chain:
         #     if j.type != 'fixed':
-        #         free_chain.append(j)
+        #         joint_names.append(j)
         #         n += 1
         # self._chain = chain
-        # self._free_chain = free_chain
+        # self._joint_names = joint_names
         # self._n = n
         return
 
@@ -77,12 +77,14 @@ class ScrewParser(object):
         Slist = np.zeros((6, self._n))
         # M0 = np.zeros((4,4))
         # M0[-1,1] = 1
-        M0 = np.array(self._chain.forward(np.zeros(self._n)))
-        for i,j in enumerate(self._free_chain):
+        M0 = np.array(self._kdl_model.forward(np.zeros(self._n)))
+        for i,j in enumerate(self._joint_names):
             joint = self._robot.joint_map[j]
-            g_base_child = np.array(self._chain.forward(np.zeros(self._n), joint.child))
+            g_base_child = np.array(self._kdl_model.forward(np.zeros(self._n), joint.child))
             if joint.type in ['revolute', 'continuous']:
                 axis_child = np.array(joint.axis)
+                print axis_child
+                print g_base_child
                 axis_base = np.dot(g_base_child[0:3,0:3], axis_child)
                 q_vec = g_base_child[0:3,-1]
                 v_vec = -np.cross(axis_base, q_vec)
