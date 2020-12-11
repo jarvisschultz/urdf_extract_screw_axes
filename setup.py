@@ -2,7 +2,8 @@ from setuptools import setup
 
 install_requires = [
     'numpy',
-    'urdf_parser_py'
+    'urdf_parser_py',
+    # 'kdl_parser_py'
     ]
 
 tests_require = [
@@ -19,5 +20,6 @@ setup(
     description='Tool for converting URDF robot descriptions to screw axes',
     long_description=open('README.org').read(),
     install_requires=install_requires,
-    tests_require=tests_require
+    tests_require=tests_require,
+    test_suite='nose.collector'
 )
