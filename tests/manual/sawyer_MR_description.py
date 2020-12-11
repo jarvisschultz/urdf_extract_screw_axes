@@ -1,5 +1,6 @@
 import numpy as np
 from math import cos, sin, radians
+import modern_robotics as mr
 
 ################################
 # STORE RE-USED TRIG FUNCTIONS #
@@ -21,6 +22,14 @@ Blist = Blist.T
 
 
 M0 = np.array([[0., 0., 1., 1.0155],
-               [-c10, -s10, 0., 0.1603],
-               [s10, -c10, 0., 0.317],
-               [0., 0., 0., 1.]])
+                   [-c10, -s10, 0., 0.1603],
+                   [s10, -c10, 0., 0.317],
+                   [0., 0., 0., 1.]])
+
+
+#########################################
+# CONVERT BODY SCREWS TO SPATIAL SCREWS #
+#########################################
+Slist = np.zeros(Blist.shape)
+for i, s in enumerate(Blist.T):
+    Slist[:,i] = np.dot(mr.Adjoint(M0), s)

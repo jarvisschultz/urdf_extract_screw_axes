@@ -87,10 +87,13 @@ class ScrewParser(object):
                 q_vec = g_base_child[0:3,-1]
                 v_vec = -np.cross(axis_base, q_vec)
                 Slist[:,i] = np.hstack((axis_base, v_vec))
-            # elif j.type is 'prismatic':
+            elif joint.type == 'prismatic':
+                axis_child = np.array(joint.axis)
+                axis_base = np.dot(g_base_child[0:3,0:3], axis_child)
+                Slist[:,i] = np.hstack(([0,0,0], axis_base))
             else:
-                print "[ERROR] on joint {0:d} (name = {1:s} type = {2:s})".format(i, j.name, j.type)
-                raise ValueError("Currently only support revolute and prismatic joints")
+                print "[ERROR] on joint {0:d} (name = {1:s} type = {2:s})".format(i, joint.name, joint.type)
+                raise ValueError("Currently only support revolute, continuous, and prismatic joints")
         return M0, Slist
 
     def get_body_description(self):
