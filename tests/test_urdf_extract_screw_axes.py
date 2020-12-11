@@ -180,9 +180,9 @@ def rrprrr_fk_test():
     run_fk_body(fname, "space_frame", "body_frame", rmr.Blist, rmr.M0)
     return
 
-# def ur5_fk_test():
-#     import ur5_MR_description as umr
-#     fname = "urdf/ur5.urdf"
-#     run_fk_spatial(fname, "base_link", "tool0", umr.Slist, umr.M0)
-#     run_fk_body(fname, "base_link", "tool0", umr.Blist, umr.M0)
-#     return
+def ur5_fk_test():
+    import ur5_MR_description as umr
+    fname = "urdf/ur5.urdf"
+    run_fk_spatial(fname, "base_link", "ee_link", umr.Slist, umr.M0)
+    run_fk_body(fname, "base_link", "ee_link", umr.Blist, umr.M0)
+    return
